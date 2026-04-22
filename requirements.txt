@@ -1,0 +1,11 @@
+# 抖音下载器 MCP Server 依赖
+mcp[cli]>=1.0.0
+requests>=2.28.0
+rich>=13.7.0
+tqdm>=4.66.0
+
+# Playwright 浏览器自动化（用于详情页 a_bogus 签名绕过）
+playwright>=1.40.0
+
+# 测试
+pytest>=7.4.0
