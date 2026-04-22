@@ -12,8 +12,8 @@
 
 如果你需要更细的步骤，请继续看：
 
-- 人类使用说明：[docs/HUMAN_SETUP.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/docs/HUMAN_SETUP.md)
-- Agent 执行手册：[docs/AGENT_RUNBOOK.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/docs/AGENT_RUNBOOK.md)
+- 人类使用说明：[docs/HUMAN_SETUP.md](docs/HUMAN_SETUP.md)
+- Agent 执行手册：[docs/AGENT_RUNBOOK.md](docs/AGENT_RUNBOOK.md)
 
 ## 先说结论
 
@@ -202,5 +202,5 @@ tests/                  分发、安装与导入验证
 
 ## 适合继续阅读哪份文档
 
-- 你想把它挂到自己的客户端里，优先看 [docs/HUMAN_SETUP.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/docs/HUMAN_SETUP.md)
-- 你是 agent，或者要把执行步骤交给 agent，优先看 [docs/AGENT_RUNBOOK.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/docs/AGENT_RUNBOOK.md)
+- 你想把它挂到自己的客户端里，优先看 [docs/HUMAN_SETUP.md](docs/HUMAN_SETUP.md)
+- 你是 agent，或者要把执行步骤交给 agent，优先看 [docs/AGENT_RUNBOOK.md](docs/AGENT_RUNBOOK.md)

@@ -8,8 +8,8 @@
 
 这份 runbook 适合 agent 直接照着执行，也适合人类把步骤交给 agent 代跑。
 
-如果你只需要仓库总览，请先看 [README.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/README.md)。  
-如果你要给人类用户提供更友好的操作说明，请看 [docs/HUMAN_SETUP.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/docs/HUMAN_SETUP.md)。
+如果你只需要仓库总览，请先看 [README.md](../README.md)。  
+如果你要给人类用户提供更友好的操作说明，请看 [docs/HUMAN_SETUP.md](HUMAN_SETUP.md)。
 
 ## 前置假设
 

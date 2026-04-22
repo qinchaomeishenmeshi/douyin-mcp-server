@@ -4,8 +4,8 @@
 
 这份文档适合想自己安装、挂载和使用这个 MCP 的人。
 
-如果你只想快速看总览，请先看 [README.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/README.md)。  
-如果你要把步骤交给 agent 执行，请看 [docs/AGENT_RUNBOOK.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/docs/AGENT_RUNBOOK.md)。
+如果你只想快速看总览，请先看 [README.md](../README.md)。  
+如果你要把步骤交给 agent 执行，请看 [docs/AGENT_RUNBOOK.md](AGENT_RUNBOOK.md)。
 
 ## 这是什么
 
