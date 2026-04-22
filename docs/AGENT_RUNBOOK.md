@@ -1,19 +1,26 @@
-# Agent Runbook
+# Agent 执行手册
 
-## Goal
+## 目标
 
-Install, verify, and mount this Douyin MCP server in a way that does not rely on any external `douyin-downloader` checkout.
+把这个仓库安装、验证并挂载成一个可直接使用的抖音 MCP 服务，而且整个过程不依赖任何外部 `douyin-downloader` checkout。
 
-## Assumptions
+## 适用场景
 
-- Working directory is the repository root.
-- Python `3.11` is available.
-- The target MCP client supports stdio servers.
-- If restricted endpoints are needed, the human can provide a valid Douyin cookie.
+这份 runbook 适合 agent 直接照着执行，也适合人类把步骤交给 agent 代跑。
 
-## Fast path
+如果你只需要仓库总览，请先看 [README.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/README.md)。  
+如果你要给人类用户提供更友好的操作说明，请看 [docs/HUMAN_SETUP.md](/Users/cherishxn/workspace/pycharm_projects/douyin-mcp-server/docs/HUMAN_SETUP.md)。
 
-Run these commands in order:
+## 前置假设
+
+- 当前工作目录是仓库根目录
+- Python `3.11` 可用
+- 目标客户端支持 stdio MCP server
+- 如果需要访问受限接口，人类可以提供有效的抖音 Cookie
+
+## 推荐执行路径
+
+按下面顺序执行：
 
 ```bash
 python3.11 -m pip install .
@@ -23,29 +30,32 @@ douyin-mcp-server --help
 douyin-mcp-smoke --help
 ```
 
-Expected results:
+期望结果：
 
-- `pytest` passes
-- `douyin-mcp-server --help` exits with code `0`
+- `pytest` 通过
+- `douyin-mcp-server --help` 退出码为 `0`
+- `douyin-mcp-smoke --help` 退出码为 `0`
 
-## Codex mount
+不要跳过 `playwright install chromium`。真实联调已经验证过，`get_video_info` 在详情接口返回空响应时，会回退到 Playwright 浏览器路径；如果没有 Chromium，链路会在回退阶段失败。
 
-Preferred command:
+## Codex 挂载
+
+优先使用安装后命令路径：
 
 ```bash
 codex mcp add douyin-downloader -- douyin-mcp-server
 ```
 
-Verify:
+校验命令：
 
 ```bash
 codex mcp list
 codex mcp get douyin-downloader
 ```
 
-## Claude Desktop mount
+## Claude Desktop 挂载
 
-Use this config when the package command is available:
+如果已经安装成命令，使用：
 
 ```json
 {
@@ -57,7 +67,7 @@ Use this config when the package command is available:
 }
 ```
 
-Fallback config if package installation is not desired:
+如果不走安装路径，而是直接从仓库运行，使用：
 
 ```json
 {
@@ -70,9 +80,25 @@ Fallback config if package installation is not desired:
 }
 ```
 
-## Minimal health checks
+## 仓库直跑回退路径
 
-### Repository mode
+如果安装成命令失败，先不要假设仓库本身不可用。先验证仓库直跑路径：
+
+```bash
+python3.11 -m pip install -r requirements.txt
+python3.11 -m playwright install chromium
+python3.11 server.py --help
+```
+
+然后再用绝对路径挂载：
+
+```bash
+codex mcp add douyin-downloader -- python3.11 -u /ABSOLUTE/PATH/TO/douyin-mcp-server/server.py
+```
+
+## 最小健康检查
+
+### 仓库模式检查
 
 ```bash
 python3.11 server.py --help
@@ -83,43 +109,41 @@ print(server.get_task_status("missing"))
 PY
 ```
 
-Expected:
+期望结果：
 
-- help text prints successfully
-- `callable(server.main)` is `True`
-- missing task returns an error dict, not an import failure
+- 帮助文本正常输出
+- `callable(server.main)` 为 `True`
+- 不存在的任务返回错误字典，而不是导入失败
 
-### Distribution mode
-
-Use this to validate third-party portability:
+### 分发模式检查
 
 ```bash
 python3.11 -m pytest -q tests/test_distribution.py
 ```
 
-This verifies:
+这个测试覆盖的点包括：
 
-- the repo can be copied without an external downloader checkout
-- `pyproject.toml` is present
-- `server.main()` exists
-- the installed console script starts and serves `--help`
-- the repo-distributed smoke script starts and serves `--help`
+- 仓库可以脱离外部 downloader checkout 单独分发
+- `pyproject.toml` 存在
+- `server.main()` 存在
+- 安装后的 console script 可以正常输出 `--help`
+- 仓库自带的 smoke script 可以正常输出 `--help`
 
-## Cookie workflow
+## Cookie 处理约束
 
-If the user needs restricted endpoints, tell them to call:
+如果需要访问受限接口，引导用户在 MCP 客户端里调用：
 
 ```text
 set_cookie("name1=value1; name2=value2; ...")
 ```
 
-Do not write real cookies into repository files.
+不要把真实 Cookie 写入仓库文件、示例配置或提交记录。
 
-## Optional real-network smoke test
+## 可选的真实联网 smoke test
 
-Run this only when a human has provided a real share URL and a real cookie, and when live network verification is useful.
+只有在用户明确提供真实 share URL 和真实 Cookie，且需要做在线验证时，才运行下面的命令。
 
-Installed-command mode:
+已安装命令时：
 
 ```bash
 DOUYIN_COOKIE='real cookie'
@@ -128,7 +152,7 @@ douyin-mcp-smoke \
   --strict
 ```
 
-Repository mode:
+仓库模式时：
 
 ```bash
 DOUYIN_COOKIE='real cookie'
@@ -137,22 +161,22 @@ python3.11 scripts/smoke_test.py \
   --strict
 ```
 
-Expected behavior:
+期望行为：
 
-- `set_cookie` output prints first if a cookie is supplied
-- `parse_link` returns a `key_type`
-- if `key_type == "aweme"`, `get_video_info` runs next
-- `--strict` makes MCP error payloads fail the smoke command with a non-zero exit code
+- 如果提供了 Cookie，先输出 `set_cookie`
+- `parse_link` 返回 `key_type`
+- 如果 `key_type == "aweme"`，继续调用 `get_video_info`
+- 开启 `--strict` 后，只要 MCP 返回错误 payload，就应该以非零退出码结束
 
-## Operational limits
+## 运行限制
 
-- Async task state is process-local and non-persistent.
-- Batch jobs are suitable for a local workstation session, not as a durable job queue.
-- Playwright is a fallback dependency for unstable detail endpoints.
+- 异步任务状态只存在于当前进程内存中，不会持久化
+- 批量下载适合本地工作站会话，不适合作为持久任务队列
+- Playwright 不是装饰性依赖，而是详情接口异常时的回退依赖
 
-## If startup fails
+## 启动失败时的排查顺序
 
-Run these checks in order:
+按下面顺序排查，不要跳步：
 
 ```bash
 python3.11 -m pip install .
@@ -161,8 +185,25 @@ python3.11 -m pytest -q tests/test_distribution.py
 douyin-mcp-server --help
 ```
 
-If package-mode startup still fails, use repository mode:
+如果安装后的命令仍然无法启动，再切换到仓库模式：
 
 ```bash
 python3.11 -u /ABSOLUTE/PATH/TO/douyin-mcp-server/server.py --help
 ```
+
+如果真实联网 smoke test 失败，优先按下面顺序判断原因：
+
+1. Chromium 是否已安装
+2. Cookie 是否有效
+3. 抖音详情接口是否出现空响应
+4. 是否已经触发 Playwright 回退路径
+
+## 交付时建议回报什么
+
+如果 agent 需要向人类回报执行结果，建议至少包含：
+
+- 安装是否成功
+- `pytest` 是否通过
+- `douyin-mcp-server --help` 是否正常
+- 是否已经完成 MCP 挂载
+- 如果做了真实联调，`set_cookie -> parse_link -> get_video_info` 是否跑通
